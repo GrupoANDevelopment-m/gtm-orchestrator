@@ -1,0 +1,33 @@
+# Full local stack: API + worker (in the API process) + Redis + Postgres.
+# Runs in DEMO_MODE by default — no keys needed. Drop a .env to go live.
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DEMO_MODE: "true"
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: docker
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: leads
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

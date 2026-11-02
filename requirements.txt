@@ -1,0 +1,18 @@
+# Core deps
+pydantic>=2.0
+pydantic-settings>=2.0
+email-validator>=2.0
+
+# HTTP / testing
+httpx>=0.27
+pytest>=8.0
+pytest-cov>=4.0
+
+# Optional (used in some flows, server runs without them)
+playwright>=1.40
+openai>=1.0
+requests>=2.31
+
+# NOTE: This file lists runtime deps. The repo also imports from upstream
+# sub-repos (gtm-engine, Prospex, speed-to-lead, crm-release) which have
+# their own requirements managed by their respective setups.

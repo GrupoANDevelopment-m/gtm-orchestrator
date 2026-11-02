@@ -1,0 +1,40 @@
+[
+  {
+    "email": "maria@northwind-logistics.com",
+    "name": "Maria Chen",
+    "company": "Northwind Logistics",
+    "message": "We're evaluating tools and need pricing for a 40-person team. Can we book a demo this week?",
+    "source": "google_ads"
+  },
+  {
+    "email": "deepak@scaleup.io",
+    "name": "Deepak Rao",
+    "message": "Ready to get started — how do I sign up and what does onboarding look like?",
+    "source": "linkedin"
+  },
+  {
+    "email": "sam.builder@gmail.com",
+    "name": "Sam",
+    "message": "Just curious what your product does. No rush.",
+    "source": "newsletter"
+  },
+  {
+    "email": "growth@bestseoagency.biz",
+    "name": "SEO Outreach",
+    "message": "We provide guest post backlinks to increase your ranking. Visit https://x.io and https://y.io",
+    "source": "contact_form"
+  },
+  {
+    "email": "jordan@apex-health.com",
+    "name": "Jordan Patel",
+    "company": "Apex Health",
+    "message": "Interested in a partnership / integration between our platforms.",
+    "source": "referral"
+  },
+  {
+    "email": "student@gmail.com",
+    "name": "Alex",
+    "message": "Do you have any open internship or junior engineer positions? Attaching my resume.",
+    "source": "careers_page"
+  }
+]

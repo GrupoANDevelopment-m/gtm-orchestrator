@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GTM Orchestrator v10</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<!-- Animated backgrounds -->
+<div id="particles"></div>
+<div id="grid-bg"></div>
+<div class="aurora a1"></div>
+<div class="aurora a2"></div>
+
+<div class="app">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">GTM</div>
+      <div>
+        <div class="brand-name">Orchestrator v10</div>
+        <div class="brand-sub">Advanced AI Agent &middot; 60+ endpoints &middot; 0 mocks</div>
+      </div>
+    </div>
+    <div class="topbar-status" id="topbar-status">
+      <span class="dot"></span> <span id="topbar-msg">connecting...</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn ghost" onclick="runHealth()">Health</button>
+      <button class="btn ghost" onclick="runReadyz()">Ready</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section">
+      <h4>Discover</h4>
+      <div class="nav-list">
+        <button data-tab="caps" class="active"><span class="ico">.O</span> Overview</button>
+        <button data-tab="discover"><span class="ico">.D</span> Discover Leads</button>
+        <button data-tab="leads"><span class="ico">.L</span> Leads</button>
+        <button data-tab="leads-enrich"><span class="ico">.E</span> Lead Enrichment</button>
+        <button data-tab="funnel"><span class="ico">.F</span> Funnel</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Score</h4>
+      <div class="nav-list">
+        <button data-tab="qualify"><span class="ico">.Q</span> Qualify Inbound</button>
+        <button data-tab="icp"><span class="ico">.I</span> ICP Scoring</button>
+        <button data-tab="prospex"><span class="ico">.P</span> Prospex Score</button>
+        <button data-tab="identity"><span class="ico">.N</span> Identity Match</button>
+        <button data-tab="crm-evidence"><span class="ico">.V</span> CRM Evidence</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Draft</h4>
+      <div class="nav-list">
+        <button data-tab="draft-outbound"><span class="ico">.B</span> Outbound (3 variations)</button>
+        <button data-tab="draft-reply"><span class="ico">.R</span> Inbound Reply</button>
+        <button data-tab="drafts"><span class="ico">.M</span> Draft Queue</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Deal Health</h4>
+      <div class="nav-list">
+        <button data-tab="deal"><span class="ico">.K</span> Deal Risk</button>
+        <button data-tab="health"><span class="ico">.H</span> Account Health</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Channels</h4>
+      <div class="nav-list">
+        <button data-tab="social"><span class="ico">.S</span> Social Channels</button>
+        <button data-tab="browser"><span class="ico">.B</span> Browser Flows</button>
+        <button data-tab="outreach"><span class="ico">.U</span> Outreach Plan</button>
+        <button data-tab="voice"><span class="ico">.V</span> Voice Agent</button>
+        <button data-tab="pipeline"><span class="ico">.X</span> Full Pipeline</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Memory</h4>
+      <div class="nav-list">
+        <button data-tab="memory"><span class="ico">.M</span> Memory &amp; Lessons</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Cognitive</h4>
+      <div class="nav-list">
+        <button data-tab="cognitive"><span class="ico">.C</span> Cognitive Loop</button>
+        <button data-tab="constitutional"><span class="ico">.T</span> Constitutional</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Compliance</h4>
+      <div class="nav-list">
+        <button data-tab="compliance"><span class="ico">.L</span> Compliance</button>
+        <button data-tab="gdpr"><span class="ico">.G</span> GDPR/LGPD</button>
+        <button data-tab="security"><span class="ico">.Y</span> Security</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Observability</h4>
+      <div class="nav-list">
+        <button data-tab="observability"><span class="ico">.B</span> Metrics &amp; Breakers</button>
+        <button data-tab="webhooks"><span class="ico">.W</span> Webhook Tester</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>DSH</h4>
+      <div class="nav-list">
+        <button data-tab="dsh"><span class="ico">.D</span> DeepSeek Harness</button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <h4>Chat</h4>
+      <div class="nav-list">
+        <button data-tab="chat"><span class="ico">.C</span> Chat with Agent</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- OVERVIEW -->
+    <section id="tab-caps" class="tab-pane active">
+      <div class="page-head"><div class="page-title">Overview<span class="sub">all capabilities &middot; all endpoints</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Capability list</div>
+          <div id="sys-caps">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Quick start</div>
+          <div class="quickstart">
+            <button class="btn primary" onclick="switchTab('discover'); loadDiscover()">1. Discover leads</button>
+            <button class="btn primary" onclick="switchTab('qualify'); loadQualify()">2. Qualify inbound</button>
+            <button class="btn primary" onclick="switchTab('icp'); loadIcp()">3. ICP score</button>
+            <button class="btn primary" onclick="switchTab('draft-outbound'); loadDraftOutbound()">4. Draft outbound</button>
+            <button class="btn primary" onclick="switchTab('social'); loadSocial()">5. Pick channel</button>
+            <button class="btn primary" onclick="switchTab('pipeline'); runPipeline()">Full pipeline (one click)</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">System</div>
+          <div id="sys-stats">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Channels (5 + 9 + 15 = 29)</div>
+          <div id="sys-channels">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISCOVER LEADS -->
+    <section id="tab-discover" class="tab-pane">
+      <div class="page-head"><div class="page-title">Discover Leads<span class="sub">Google Maps prospect + URL extract</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Google Maps prospect</div>
+          <p class="muted" style="font-size:11px;margin-bottom:8px">Search any city + query. Returns up to 50 leads with name/phone/rating.</p>
+          <div style="display:grid;gap:8px">
+            <input id="gmaps-query" placeholder="query (e.g. SaaS startup)" value="SaaS startup" />
+            <input id="gmaps-city" placeholder="city" value="San Francisco" />
+            <input id="gmaps-count" type="number" min="1" max="50" value="5" />
+            <button class="btn primary" onclick="runGoogleMaps()">Run Google Maps</button>
+          </div>
+          <div id="gmaps-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Extract from URL</div>
+          <p class="muted" style="font-size:11px;margin-bottom:8px">Jina reader extracts structured leads from any URL.</p>
+          <input id="extract-url" placeholder="https://..." value="https://www.ycombinator.com/companies" />
+          <button class="btn primary" onclick="runExtract()" style="margin-top:8px">Extract</button>
+          <div id="extract-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADS LIST -->
+    <section id="tab-leads" class="tab-pane">
+      <div class="page-head"><div class="page-title">Leads<span class="sub">SQLite-backed, real persistence</span></div></div>
+      <div class="panel">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input id="leads-filter" placeholder="filter (industry, city, source...)" style="flex:1" />
+          <button class="btn" onclick="loadLeads()">Refresh</button>
+        </div>
+        <div id="leads-list" style="font-family:var(--font-mono);font-size:11px;max-height:600px;overflow:auto">—</div>
+      </div>
+    </section>
+
+    <!-- LEAD ENRICHMENT -->
+    <section id="tab-leads-enrich" class="tab-pane">
+      <div class="page-head"><div class="page-title">Lead Enrichment<span class="sub">Apollo + Hunter</span></div></div>
+      <div class="panel">
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Enrich an existing lead_id with Apollo (company/contacts) + Hunter (email finder).</p>
+        <input id="enrich-id" type="number" placeholder="lead_id" value="5" />
+        <button class="btn primary" onclick="runEnrich()" style="margin-top:8px">Enrich</button>
+        <div id="enrich-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:500px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- FUNNEL -->
+    <section id="tab-funnel" class="tab-pane">
+      <div class="page-head"><div class="page-title">Funnel<span class="sub">conversion analytics</span></div></div>
+      <div class="panel"><div id="funnel-data">—</div></div>
+    </section>
+
+    <!-- QUALIFY INBOUND -->
+    <section id="tab-qualify" class="tab-pane">
+      <div class="page-head"><div class="page-title">Qualify Inbound<span class="sub">speed-to-lead RuleQualifier</span></div></div>
+      <div class="panel glow">
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Real speed-to-lead qualifier. Returns tier, intent, score, fit_signals.</p>
+        <div style="display:grid;gap:8px">
+          <input id="q-name" placeholder="contact name" value="Sarah Chen" />
+          <input id="q-company" placeholder="company" value="Acme Corp" />
+          <input id="q-email" placeholder="email" value="sarah@acme.com" />
+          <textarea id="q-message" rows="3" placeholder="message">We have 50 sales reps and need a tool that scores and routes leads in &lt; 60 seconds. What's the price?</textarea>
+          <button class="btn primary" onclick="runQualify()">Qualify</button>
+        </div>
+        <div id="qualify-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- ICP SCORING -->
+    <section id="tab-icp" class="tab-pane">
+      <div class="page-head"><div class="page-title">ICP Scoring<span class="sub">NIM 30B trains on positive/negative examples</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Train ICP</div>
+          <textarea id="icp-text" rows="4" placeholder="profile text">Senior VP Sales at mid-market SaaS, 50-200 employees, B2B, US-based</textarea>
+          <select id="icp-label" style="margin-top:8px">
+            <option value="positive">positive (good fit)</option>
+            <option value="negative">negative (bad fit)</option>
+          </select>
+          <button class="btn primary" onclick="runIcpTrain()" style="margin-top:8px">Add profile</button>
+          <div id="icp-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Score a lead</div>
+          <input id="icp-lead-email" placeholder="email" value="ceo@techflow.io" />
+          <input id="icp-lead-company" placeholder="company" value="TechFlow" style="margin-top:8px" />
+          <input id="icp-lead-title" placeholder="title" value="CEO" style="margin-top:8px" />
+          <button class="btn primary" onclick="runIcpScore()" style="margin-top:8px">Score</button>
+          <div id="icp-score-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROSPEX SCORE -->
+    <section id="tab-prospex" class="tab-pane">
+      <div class="page-head"><div class="page-title">Prospex Score<span class="sub">Bayesian + city priors</span></div></div>
+      <div class="panel glow">
+        <div style="display:grid;gap:8px">
+          <input id="ps-lead-email" placeholder="email" value="ceo@techflow.io" />
+          <input id="ps-lead-company" placeholder="company" value="TechFlow" />
+          <input id="ps-lead-city" placeholder="city" value="San Francisco" />
+          <button class="btn primary" onclick="runProspexScore()">Score single</button>
+        </div>
+        <div id="ps-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        <hr style="margin:20px 0;opacity:0.2" />
+        <div class="panel-title">Batch</div>
+        <textarea id="ps-batch" rows="4">[{&quot;email&quot;:&quot;a@x.com&quot;,&quot;company&quot;:&quot;X&quot;,&quot;city&quot;:&quot;Miami&quot;},{&quot;email&quot;:&quot;b@y.com&quot;,&quot;company&quot;:&quot;Y&quot;,&quot;city&quot;:&quot;NYC&quot;}]</textarea>
+        <button class="btn primary" onclick="runProspexBatch()" style="margin-top:8px">Score batch</button>
+        <div id="ps-batch-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- IDENTITY MATCH -->
+    <section id="tab-identity" class="tab-pane">
+      <div class="page-head"><div class="page-title">Identity Match<span class="sub">email + employer + name match</span></div></div>
+      <div class="panel glow">
+        <div style="display:grid;gap:8px">
+          <input id="id-name" placeholder="name" value="John Smith" />
+          <input id="id-email" placeholder="email" value="john@acme.com" />
+          <input id="id-employer" placeholder="employer" value="Acme Corp" />
+          <button class="btn primary" onclick="runIdentity()">Verdict</button>
+        </div>
+        <div id="id-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+      </div>
+    </section>
+
+    <!-- CRM EVIDENCE -->
+    <section id="tab-crm-evidence" class="tab-pane">
+      <div class="page-head"><div class="page-title">CRM Evidence<span class="sub">1 - product(1-weight) Bayesian</span></div></div>
+      <div class="panel">
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Combine independent signals (page_views, demo_request, etc) into single fit score.</p>
+        <input id="ev-weights" placeholder="weights (comma)" value="0.4, 0.7, 0.9" />
+        <button class="btn primary" onclick="runCrmEvidence()" style="margin-top:8px">Score</button>
+        <div id="ev-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- DRAFT OUTBOUND -->
+    <section id="tab-draft-outbound" class="tab-pane">
+      <div class="page-head"><div class="page-title">Outbound 3 Variations<span class="sub">gtm-engine OutboundAgent</span></div></div>
+      <div class="panel glow">
+        <div style="display:grid;gap:8px">
+          <input id="ob-contact" placeholder="contact name" value="Sarah Chen" />
+          <input id="ob-company" placeholder="company" value="Acme Corp" />
+          <input id="ob-industry" placeholder="industry" value="SaaS" />
+          <input id="ob-campaign" placeholder="campaign name" value="q4-outreach" />
+          <button class="btn primary" onclick="runDraftOutbound()">Generate 3 variations</button>
+        </div>
+        <div id="ob-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:500px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- DRAFT REPLY -->
+    <section id="tab-draft-reply" class="tab-pane">
+      <div class="page-head"><div class="page-title">Inbound Reply<span class="sub">speed-to-lead TemplateDrafter (NIM)</span></div></div>
+      <div class="panel">
+        <div style="display:grid;gap:8px">
+          <input id="dr-name" placeholder="name" value="Sarah" />
+          <input id="dr-company" placeholder="company" value="Acme" />
+          <input id="dr-lead-id" type="number" placeholder="lead_id (optional)" value="5" />
+          <textarea id="dr-message" rows="3" placeholder="their message">Need lead routing for 50 sales reps, &lt; 60s response time. Budget approved.</textarea>
+          <button class="btn primary" onclick="runDraftReply()">Draft</button>
+        </div>
+        <div id="dr-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- DRAFTS QUEUE -->
+    <section id="tab-drafts" class="tab-pane">
+      <div class="page-head"><div class="page-title">Draft Queue<span class="sub">approve &amp; send</span></div></div>
+      <div class="panel">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <select id="drafts-status">
+            <option value="">all</option>
+            <option value="pending" selected>pending</option>
+            <option value="approved">approved</option>
+            <option value="sent">sent</option>
+            <option value="rejected">rejected</option>
+          </select>
+          <button class="btn" onclick="loadDrafts()">Refresh</button>
+        </div>
+        <div id="drafts-list" style="font-family:var(--font-mono);font-size:11px;max-height:600px;overflow:auto">—</div>
+      </div>
+    </section>
+
+    <!-- DEAL RISK -->
+    <section id="tab-deal" class="tab-pane">
+      <div class="page-head"><div class="page-title">Deal Risk<span class="sub">gtm-engine DealIntelAgent</span></div></div>
+      <div class="panel">
+        <textarea id="dr-deal" rows="6">{"name":"Acme Q4 expansion","amount":50000,"stage":"negotiation","last_contact_days":21,"stakeholders":["CTO","VP Sales"]}</textarea>
+        <button class="btn primary" onclick="runDealRisk()" style="margin-top:8px">Analyse</button>
+        <div id="dr-risk-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT HEALTH -->
+    <section id="tab-health" class="tab-pane">
+      <div class="page-head"><div class="page-title">Account Health<span class="sub">gtm-engine RetentionAgent</span></div></div>
+      <div class="panel">
+        <textarea id="ah-account" rows="6">{"name":"Acme Corp","tier":"enterprise","logins_last_30d":12,"support_tickets":3,"nps":7,"renewal_date":"2026-12-01"}</textarea>
+        <button class="btn primary" onclick="runHealthScore()" style="margin-top:8px">Score</button>
+        <div id="ah-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- SOCIAL CHANNELS -->
+    <section id="tab-social" class="tab-pane">
+      <div class="page-head"><div class="page-title">Social Channels<span class="sub">5 write + 9 browser + 15 read = 29</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">API-based (5 channels)</div>
+          <div id="social-channels">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Test a channel</div>
+          <select id="social-test-channel" style="margin-bottom:8px">
+            <option value="">all</option>
+            <option value="whatsapp">whatsapp</option>
+            <option value="discord">discord</option>
+            <option value="telegram">telegram</option>
+            <option value="linkedin">linkedin</option>
+            <option value="instagram">instagram</option>
+          </select>
+          <button class="btn primary" onclick="testSocialChannel()">Test</button>
+          <div id="social-test-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Read platforms (15)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px" id="social-read-platforms">—</div>
+        <div style="display:grid;gap:8px;grid-template-columns:200px 1fr">
+          <select id="read-platform">
+            <option value="github">github (REST)</option>
+            <option value="v2ex">v2ex (public API)</option>
+            <option value="rss">rss (XML)</option>
+            <option value="web">web (Jina)</option>
+            <option value="youtube">youtube (yt-dlp)</option>
+          </select>
+          <input id="read-target" placeholder="target (owner/repo, URL, @handle)" value="anthropics/anthropic-sdk-python" />
+        </div>
+        <button class="btn primary" style="margin-top:8px" onclick="doReadSocial()">Read</button>
+        <div id="read-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- BROWSER FLOWS -->
+    <section id="tab-browser" class="tab-pane">
+      <div class="page-head"><div class="page-title">Browser Flows<span class="sub">n8n-style automation &middot; no API keys &middot; uses your Chrome</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Setup status</div>
+          <div id="browser-setup-status">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Browser channels (9)</div>
+          <div id="browser-channels-list">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">8 n8n-style flows</div>
+        <div id="flows-list" style="display:grid;gap:8px;grid-template-columns:repeat(2,1fr)">—</div>
+      </div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Cross-post content</div>
+          <textarea id="flow-cross-text" style="height:80px">We just shipped AI-powered lead routing that scored 847 leads in 4 minutes and booked 12 meetings on day one.</textarea>
+          <input id="flow-cross-tags" placeholder="hashtags (comma)" value="ai,sales,b2b" />
+          <button class="btn primary" style="margin-top:8px" onclick="runFlow('cross_post_content')">Cross-post to 4 channels</button>
+          <div id="flow-cross-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Quote to post</div>
+          <textarea id="flow-quote-text" style="height:60px">Speed of lead response is the #1 predictor of qualification success</textarea>
+          <input id="flow-quote-author" placeholder="author" value="InsideSales.com" />
+          <button class="btn primary" style="margin-top:8px" onclick="runFlow('quote_to_post')">Format + distribute</button>
+          <div id="flow-quote-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Social listening (REAL NIM)</div>
+        <div style="display:grid;gap:8px;grid-template-columns:1fr 2fr">
+          <input id="flow-listening-brand" placeholder="brand (e.g. stripe)" value="stripe" />
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <label><input type="checkbox" class="flow-platform" value="github" checked> GitHub</label>
+            <label><input type="checkbox" class="flow-platform" value="web" checked> Web</label>
+            <label><input type="checkbox" class="flow-platform" value="rss"> RSS</label>
+            <label><input type="checkbox" class="flow-platform" value="v2ex"> V2EX</label>
+          </div>
+        </div>
+        <button class="btn primary" style="margin-top:8px" onclick="runFlow('social_listening')">Listen for brand</button>
+        <div id="flow-listening-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Auto-respond DMs (browser-based)</div>
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Tests browser login + drafts NIM reply + posts via browser.</p>
+        <select id="flow-ar-platform">
+          <option value="gmail">gmail</option>
+          <option value="linkedin">linkedin</option>
+          <option value="twitter">twitter</option>
+        </select>
+        <button class="btn primary" style="margin-top:8px" onclick="runFlow('auto_respond_dm')">Run</button>
+        <div id="flow-ar-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- OUTREACH PLAN -->
+    <section id="tab-outreach" class="tab-pane">
+      <div class="page-head"><div class="page-title">Outreach Plan<span class="sub">auto-pick channel by geo + industry</span></div></div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Plan outreach</div>
+          <input id="outreach-lead-name" placeholder="Lead name" value="Sarah Chen" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <input id="outreach-country" placeholder="country (br/us/cn...)" value="br" />
+            <input id="outreach-industry" placeholder="industry (saas/b2b/...)" value="saas" />
+          </div>
+          <input id="outreach-phone" placeholder="phone" value="+5511999998888" style="margin-top:8px" />
+          <input id="outreach-telegram" placeholder="telegram_id" value="@sarah_chen" style="margin-top:8px" />
+          <input id="outreach-email" placeholder="email" value="sarah@acme.com" style="margin-top:8px" />
+          <input id="outreach-linkedin" placeholder="linkedin_url" value="https://linkedin.com/in/sarahchen" style="margin-top:8px" />
+          <textarea id="outreach-body" rows="3" style="margin-top:8px" placeholder="message">Hi Sarah! We help SaaS companies like Acme scale lead routing. Worth a 15-min call?</textarea>
+          <button class="btn primary" onclick="planOutreach()" style="margin-top:8px">Plan &amp; pick best</button>
+        </div>
+        <div class="panel glow">
+          <div class="panel-title">Outreach plan</div>
+          <div id="outreach-plan">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Send to a specific channel</div>
+        <div style="display:grid;gap:8px;grid-template-columns:repeat(4,1fr)">
+          <select id="send-channel">
+            <option value="whatsapp">whatsapp</option>
+            <option value="discord">discord</option>
+            <option value="telegram">telegram</option>
+            <option value="linkedin">linkedin</option>
+            <option value="instagram">instagram</option>
+          </select>
+          <input id="send-to" placeholder="to" />
+          <input id="send-subject" placeholder="subject" />
+          <button class="btn primary" onclick="doSendSocial()">Send</button>
+        </div>
+        <textarea id="send-body" rows="2" placeholder="body" style="margin-top:8px"></textarea>
+        <div id="send-result" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Auto-send (smart channel pick)</div>
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Picks the best available channel from lead context. Falls back to email if no live channel.</p>
+        <button class="btn primary" onclick="doAutoSend()">Test auto-send</button>
+        <div id="autosend-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Browser-based send (no API key)</div>
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Sends via your logged-in Chrome session (Gmail/Twitter/LinkedIn/IG/FB/HubSpot/...).</p>
+        <div style="display:grid;gap:8px;grid-template-columns:200px 1fr">
+          <select id="brow-channel">
+            <option value="gmail">gmail</option>
+            <option value="twitter">twitter</option>
+            <option value="linkedin">linkedin</option>
+            <option value="instagram">instagram</option>
+            <option value="facebook">facebook</option>
+            <option value="reddit">reddit</option>
+            <option value="whatsapp_web">whatsapp_web</option>
+          </select>
+          <input id="brow-to" placeholder="to (URL, @handle, phone...)" />
+        </div>
+        <input id="brow-subject" placeholder="subject" style="margin-top:8px" />
+        <textarea id="brow-body" rows="2" placeholder="body" style="margin-top:8px"></textarea>
+        <button class="btn primary" onclick="doBrowserSend()" style="margin-top:8px">Send via browser</button>
+        <div id="brow-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- VOICE -->
+    <section id="tab-voice" class="tab-pane">
+      <div class="page-head"><div class="page-title">Voice Agent<span class="sub">Twilio + NIM 30B &middot; 1.4s per turn</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Simulate a call turn</div>
+          <input id="voice-from" placeholder="from" value="+15551234567" />
+          <input id="voice-to" placeholder="to" value="+18005551234" style="margin-top:8px" />
+          <textarea id="voice-text" rows="3" placeholder="What the lead says" style="margin-top:8px">Hi, this is Sarah from Acme. We need lead routing for 50 sales reps.</textarea>
+          <button class="btn primary" onclick="simulateVoice()" style="margin-top:8px">Simulate turn (NIM live)</button>
+          <div id="voice-reply" style="margin-top:12px;font-family:var(--font-mono);font-size:12px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Voice TwiML endpoint</div>
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:11px;overflow:auto;white-space:pre-wrap">GET /voice/twiml
+
+Returns TwiML: &lt;Response&gt;&lt;Connect&gt;&lt;Stream url="wss://..."&gt;...&lt;/Response&gt;</pre>
+          <button class="btn" onclick="testTwiML()">GET /voice/twiml</button>
+          <div id="voice-twiml" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto">—</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Voice model key</div>
+          <button class="btn" onclick="testVoiceKey()">Test /api/voice/test</button>
+          <div id="voice-test" style="margin-top:8px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Capabilities</div>
+          <div style="font-size:12px;line-height:1.6">
+            <div><span class="tag-pill good">live</span> <strong>Twilio</strong> &mdash; TwiML &lt;Connect&gt;&lt;Stream&gt; bridge</div>
+            <div><span class="tag-pill good">live</span> <strong>NIM 30B voice</strong> &mdash; your key, 1.4s response</div>
+            <div><span class="tag-pill good">live</span> <strong>Spam detection</strong> &mdash; keyword heuristics</div>
+            <div><span class="tag-pill good">live</span> <strong>Voicemail detection</strong> &mdash; short silent turns auto-hangup</div>
+            <div><span class="tag-pill good">live</span> <strong>Multi-turn</strong> &mdash; transcript per call</div>
+            <div><span class="tag-pill muted">partial</span> <strong>TTS bridge</strong> &mdash; Twilio native TTS</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FULL PIPELINE -->
+    <section id="tab-pipeline" class="tab-pane">
+      <div class="page-head"><div class="page-title">Full Pipeline<span class="sub">SQLite leads &rarr; NIM ICP &rarr; NIM draft &rarr; outreach plan &rarr; 19-layer cognitive loop</span></div></div>
+      <div class="panel glow">
+        <p class="muted" style="font-size:11px;margin-bottom:8px">All REAL. Loads leads from SQLite, scores via NIM, drafts via NIM, picks best channel, runs cognitive loop audit.</p>
+        <button class="btn primary" onclick="runPipeline()">Run full pipeline</button>
+        <div id="pipeline-result" style="margin-top:16px;font-family:var(--font-mono);font-size:11px;max-height:600px;overflow:auto">—</div>
+      </div>
+    </section>
+
+    <!-- MEMORY & LESSONS -->
+    <section id="tab-memory" class="tab-pane">
+      <div class="page-head"><div class="page-title">Memory &amp; Lessons<span class="sub">episodic + semantic + lessons + capabilities</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Recall (semantic search)</div>
+          <input id="mem-query" placeholder="query" value="lead routing" />
+          <button class="btn primary" onclick="runRecall()" style="margin-top:8px">Recall</button>
+          <div id="mem-recall" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Remember (save to memory)</div>
+          <input id="mem-kind" placeholder="kind (lesson/episode/skill)" value="lesson" />
+          <input id="mem-content" placeholder="content" value="Tightening the loop: 5-min follow-up after a hot lead" style="margin-top:8px" />
+          <button class="btn primary" onclick="runRemember()" style="margin-top:8px">Remember</button>
+          <div id="mem-remember-result" style="margin-top:8px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Recent episodes</div>
+          <button class="btn" onclick="loadEpisodes()">Refresh</button>
+          <div id="mem-episodes" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Lessons learned</div>
+          <button class="btn" onclick="loadLessons()">Refresh</button>
+          <div id="mem-lessons" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Capabilities index</div>
+        <button class="btn" onclick="loadCapabilities()">Refresh</button>
+        <div id="mem-caps" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- COGNITIVE LOOP -->
+    <section id="tab-cognitive" class="tab-pane">
+      <div class="page-head"><div class="page-title">Cognitive Loop<span class="sub">19 layers ODC/ACAMR</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Run cycle</div>
+          <input id="cog-goal" placeholder="goal" value="Convert top 5 leads to meetings" />
+          <button class="btn primary" onclick="runCognitive()" style="margin-top:8px">Run cycle</button>
+          <div id="cog-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:500px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Synthesis / Refine / Improvement</div>
+          <button class="btn" onclick="runSynthesis()" style="display:block;margin-bottom:6px">Knowledge synthesis</button>
+          <button class="btn" onclick="runRefine()" style="display:block;margin-bottom:6px">Self-refine</button>
+          <button class="btn" onclick="runImprovement()" style="display:block;margin-bottom:6px">Improvement stats</button>
+          <div id="cog-other" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONSTITUTIONAL -->
+    <section id="tab-constitutional" class="tab-pane">
+      <div class="page-head"><div class="page-title">Constitutional Guard<span class="sub">10 invariants (I1-I10)</span></div></div>
+      <div class="panel">
+        <p class="muted" style="font-size:11px;margin-bottom:8px">Every action passes through 10 invariants: approval, PII consent, token budget, timeout, audit, subagent depth, destructive ops, failure rate, rate limits, skill promotion.</p>
+        <button class="btn primary" onclick="runConstitutional()">Run check</button>
+        <div id="const-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:500px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- COMPLIANCE -->
+    <section id="tab-compliance" class="tab-pane">
+      <div class="page-head"><div class="page-title">Compliance<span class="sub">GDPR / LGPD / CAN-SPAM / TCPA</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Consent (record opt-in)</div>
+          <input id="comp-email" placeholder="email" value="lead@example.com" />
+          <select id="comp-purpose" style="margin-top:8px">
+            <option value="marketing">marketing</option>
+            <option value="sales">sales</option>
+            <option value="transactional">transactional</option>
+          </select>
+          <select id="comp-granted" style="margin-top:8px">
+            <option value="true">granted</option>
+            <option value="false">revoked</option>
+          </select>
+          <button class="btn primary" onclick="runConsent()" style="margin-top:8px">Record</button>
+          <div id="comp-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Check consent</div>
+          <input id="comp-check-email" placeholder="email" value="lead@example.com" />
+          <select id="comp-check-purpose" style="margin-top:8px">
+            <option value="marketing">marketing</option>
+            <option value="sales">sales</option>
+          </select>
+          <button class="btn primary" onclick="runCheckConsent()" style="margin-top:8px">Check</button>
+          <div id="comp-check-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Unsubscribe URL</div>
+          <input id="comp-unsub-email" placeholder="email" value="lead@example.com" />
+          <button class="btn primary" onclick="runUnsubUrl()" style="margin-top:8px">Generate</button>
+          <div id="comp-unsub-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Retention (default 730 days)</div>
+          <input id="comp-ret-days" type="number" value="730" />
+          <button class="btn primary" onclick="runRetention()" style="margin-top:8px">Apply</button>
+          <div id="comp-ret-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Audit log</div>
+        <button class="btn" onclick="loadAudit()">Refresh</button>
+        <div id="comp-audit" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- GDPR -->
+    <section id="tab-gdpr" class="tab-pane">
+      <div class="page-head"><div class="page-title">GDPR / LGPD<span class="sub">right to delete + right to export</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Delete a lead (Art. 17)</div>
+          <input id="gdpr-del-id" type="number" placeholder="lead_id" value="6" />
+          <button class="btn primary" onclick="runGdprDelete()" style="margin-top:8px">Delete (cascades)</button>
+          <div id="gdpr-del-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Export a lead (Art. 20)</div>
+          <input id="gdpr-exp-id" type="number" placeholder="lead_id" value="5" />
+          <button class="btn primary" onclick="runGdprExport()" style="margin-top:8px">Export JSON</button>
+          <div id="gdpr-exp-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Public unsubscribe link</div>
+        <p class="muted" style="font-size:11px">Send this URL in every email. Works without auth (one-click).</p>
+        <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:11px">GET /unsubscribe?token=&lt;token&gt;</pre>
+        <button class="btn" onclick="testUnsubscribe()">Test public unsubscribe</button>
+        <div id="gdpr-unsub-result" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="tab-security" class="tab-pane">
+      <div class="page-head"><div class="page-title">Security<span class="sub">HMAC, vault, OAuth</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">HMAC sign a payload</div>
+          <textarea id="sec-body" rows="4">{"email":"test@x.com","amount":5000}</textarea>
+          <button class="btn primary" onclick="runHmacSign()" style="margin-top:8px">Sign</button>
+          <div id="sec-sign-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">HMAC verify</div>
+          <input id="sec-sig" placeholder="X-Webhook-Signature" />
+          <button class="btn primary" onclick="runHmacVerify()" style="margin-top:8px">Verify</button>
+          <div id="sec-verify-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Secrets vault</div>
+        <p class="muted" style="font-size:11px;margin-bottom:8px">All stored keys (names only, never values). Loaded from keys/ directory at boot.</p>
+        <button class="btn" onclick="loadVault()">List keys</button>
+        <div id="sec-vault" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- OBSERVABILITY -->
+    <section id="tab-observability" class="tab-pane">
+      <div class="page-head"><div class="page-title">Observability<span class="sub">Prometheus + 8 circuit breakers + graceful shutdown</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Counters &amp; gauges</div>
+          <button class="btn" onclick="loadMetrics()">Refresh</button>
+          <div id="obs-metrics" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Circuit breakers (8)</div>
+          <button class="btn" onclick="loadBreakers()">Refresh</button>
+          <div id="obs-breakers" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:400px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Prometheus /metrics</div>
+        <pre id="obs-prom" style="font-family:var(--font-mono);font-size:10px;max-height:300px;overflow:auto;background:rgba(0,0,0,0.3);padding:12px;border-radius:8px">—</pre>
+      </div>
+    </section>
+
+    <!-- WEBHOOKS -->
+    <section id="tab-webhooks" class="tab-pane">
+      <div class="page-head"><div class="page-title">Webhook Tester<span class="sub">inbound + Twilio</span></div></div>
+      <div class="grid g2">
+        <div class="panel glow">
+          <div class="panel-title">Inbound (HMAC-verified)</div>
+          <textarea id="wh-body" rows="4">{"email":"test@acme.com","name":"Sarah","message":"Need lead routing for 50 reps","phone":"+15551234567"}</textarea>
+          <input id="wh-req-id" placeholder="X-Request-ID (idempotency)" value="test-001" style="margin-top:8px" />
+          <button class="btn primary" onclick="testWebhookInbound()" style="margin-top:8px">POST /webhooks/inbound</button>
+          <div id="wh-inb-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Twilio (signed)</div>
+          <textarea id="wh-tw-body" rows="4">{"From":"+15551234567","To":"+18005551234","Body":"Yes I'm interested","CallSid":"CA123"}</textarea>
+          <button class="btn primary" onclick="testWebhookTwilio()" style="margin-top:8px">POST /webhooks/twilio</button>
+          <div id="wh-tw-result" style="margin-top:12px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DSH -->
+    <section id="tab-dsh" class="tab-pane">
+      <div class="page-head"><div class="page-title">DeepSeek Harness<span class="sub">9,162 files &middot; 100+ packages &middot; Cordis plugin framework</span></div></div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">DSH status</div>
+          <button class="btn" onclick="refreshDsh()">Refresh</button>
+          <div id="dsh-status-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+          <div style="margin-top:8px;display:flex;gap:4px">
+            <button class="btn" onclick="startDsh()">Start</button>
+            <button class="btn" onclick="stopDsh()">Stop</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Subagent delegate</div>
+          <input id="dsh-provider" placeholder="provider" value="prospect_city" />
+          <input id="dsh-spec" placeholder='spec (JSON)' value='{"name":"Miami","input":{"query":"SaaS","city":"Miami"}}' style="margin-top:8px" />
+          <button class="btn primary" onclick="runDshSubagent()" style="margin-top:8px">Delegate</button>
+          <div id="dsh-subagent-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Sessions</div>
+          <button class="btn" onclick="loadDshSessions()">Refresh</button>
+          <div id="dsh-sessions-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Subagent runs</div>
+          <button class="btn" onclick="loadDshRuns()">Refresh</button>
+          <div id="dsh-runs-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="panel">
+          <div class="panel-title">Meter summary</div>
+          <button class="btn" onclick="loadDshMeter()">Refresh</button>
+          <div id="dsh-meter-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Skills</div>
+          <button class="btn" onclick="loadDshSkills()">Refresh</button>
+          <div id="dsh-skills-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Schedule</div>
+        <div style="display:grid;gap:8px;grid-template-columns:200px 1fr">
+          <select id="dsh-sched-action">
+            <option value="list">list</option>
+            <option value="add">add</option>
+            <option value="remove">remove</option>
+            <option value="tick">tick</option>
+          </select>
+          <input id="dsh-sched-task" placeholder='task (JSON, e.g. {"name":"daily","cron":"0 9 * * *","action":"run_flow","params":{}})' />
+        </div>
+        <button class="btn primary" onclick="runDshSchedule()" style="margin-top:8px">Run</button>
+        <div id="dsh-sched-out" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap">—</div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="tab-chat" class="tab-pane">
+      <div class="page-head"><div class="page-title">Chat with Agent<span class="sub">advanced AI agent &middot; function calling &middot; memory</span></div></div>
+      <div class="panel glow">
+        <div id="chat-log" class="chat-log"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="chat-input" placeholder="ask anything: prospect, score, draft, send, find, audit..." style="flex:1" />
+          <button class="btn primary" id="btn-chat-send">Send</button>
+        </div>
+        <div class="muted" id="chat-status" style="margin-top:6px;font-size:11px"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

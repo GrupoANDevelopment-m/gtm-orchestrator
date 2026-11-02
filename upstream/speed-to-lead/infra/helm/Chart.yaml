@@ -1,0 +1,9 @@
+apiVersion: v2
+name: speed-to-lead-agent
+description: Self-hosted AI agent that qualifies and responds to inbound leads in seconds.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://github.com/OmateLabs/speed-to-lead-agent
+sources:
+  - https://github.com/OmateLabs/speed-to-lead-agent

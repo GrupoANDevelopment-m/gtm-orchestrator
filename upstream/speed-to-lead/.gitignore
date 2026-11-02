@@ -1,0 +1,30 @@
+# Secrets — never commit. Bring your own keys via .env (see .env.example).
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# ML artifacts (trained adapters, checkpoints, datasets cache)
+artifacts/
+mlruns/
+mlflow.db
+*.bin
+*.safetensors
+.cache/
+hf_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

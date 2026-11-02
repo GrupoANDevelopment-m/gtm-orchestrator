@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Output files
+output/
+
+# Misc
+.DS_Store
+*.pem
+.turbo
+coverage/
+*.log
+apps/marketing/next-env.d.ts
+apps/web/next-env.d.ts
+apps/web/next-env.d.ts

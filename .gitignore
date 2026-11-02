@@ -1,0 +1,87 @@
+# ============================================
+# SECRETS — NEVER COMMIT
+# ============================================
+keys/
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.secret
+
+# ============================================
+# Runtime data — SQLite databases (contain real lead data)
+# ============================================
+data/*.sqlite3
+data/*.db
+data/*.sqlite
+data/*.jsonl
+data/cache/
+!data/.gitkeep
+
+# Backups (contain copies of the DBs above)
+backups/
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+
+# ============================================
+# Tests / tooling
+# ============================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# ============================================
+# Node (opencli / dsh tooling)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ============================================
+# IDE / OS
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================
+# Browser automation artifacts
+# ============================================
+.playwright/
+playwright-report/
+test-results/
+user-data-dir/

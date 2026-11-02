@@ -1,0 +1,36 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/omatelabs/speed-to-lead-agent
+  tag: ""          # defaults to .Chart.AppVersion
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# App config. DEMO_MODE keeps it keyless; flip to "false" and supply secrets to go live.
+env:
+  DEMO_MODE: "true"
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "k8s"
+
+# Bring-your-own-key: reference an existing Secret instead of inlining values.
+# kubectl create secret generic speed-to-lead-secrets \
+#   --from-literal=LLM_API_KEY=... --from-literal=SLACK_WEBHOOK_URL=...
+existingSecret: ""   # e.g. "speed-to-lead-secrets"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70

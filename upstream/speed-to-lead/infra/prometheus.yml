@@ -1,0 +1,10 @@
+# Prometheus scrape config for speed-to-lead-agent.
+# The API exposes funnel metrics at /metrics/prometheus (see docker-compose.yml).
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: speed-to-lead
+    metrics_path: /metrics/prometheus
+    static_configs:
+      - targets: ["api:8000"]

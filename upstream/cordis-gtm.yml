@@ -1,0 +1,100 @@
+# Custom Cordis profile for DeepSeek Harness — GTM-tuned
+# This patches the default `dsh-base` profile to add our bundles.
+#
+# Usage:
+#   dsh --profile web --patch /workspace/orchestrator/upstream/cordis-gtm.yml
+#
+# What it does:
+# 1. Disables tools we don't need (calendar, video)
+# 2. Adds GTM-specific bundles
+# 3. Pre-configures model to NVIDIA NIM (instead of DeepSeek official)
+# 4. Mounts our orchestrator as a tool provider
+
+# Replace the default model adapter with NVIDIA NIM
+- id: llm-deepseek
+  name: '@deepseek-ai/dsh-llm-deepseek'
+  config:
+    baseUrl: !!js process.env.NVIDIA_BASE_URL ?? 'https://integrate.api.nvidia.com/v1'
+    apiKey: !!js process.env.NVIDIA_API_KEY
+    models:
+      - id: nvidia/nemotron-3.5-lightning-30b-a3b
+        name: NVIDIA Nemotron 30B
+        contextWindow: 32768
+
+# Mount our orchestrator HTTP API as a tool source
+- id: orchestrator-tools
+  name: '@deepseek-ai/dsh-mcp-bridge'  # uses MCP bridge pattern
+  config:
+    endpoint: !!js process.env.ORCHESTRATOR_URL ?? 'http://127.0.0.1:8000'
+    apiKey: !!js process.env.ORCHESTRATOR_API_KEY
+    tools:
+      - name: prospect_city
+        description: 'Prospect businesses in a city via Google Maps'
+      - name: prospex_score
+        description: 'Score a batch of leads with prospex'
+      - name: qualify_inbound
+        description: 'Qualify an inbound lead'
+      - name: draft_reply
+        description: 'Draft reply using speed-to-lead'
+      - name: draft_outbound
+        description: 'Generate outbound email variations'
+      - name: score_lead_icp
+        description: 'Score lead ICP fit'
+      - name: score_deal_risk
+        description: 'Score deal risk'
+      - name: score_account_health
+        description: 'Score account health'
+
+# Mount our DSH adapters as tool sources
+- id: dsh-subagent-tools
+  name: '@deepseek-ai/dsh-subagent-in-process'
+  config:
+    maxDepth: 3
+    policy:
+      approval: 'never'  # delegated children never need approval
+      sandbox: 'workspace-only'
+
+# Mount cognitive loop as a meta-tool
+- id: cognitive-loop
+  name: '@deepseek-ai/dsh-skill-cognitive-loop'
+  config:
+    endpoint: !!js process.env.ORCHESTRATOR_URL ?? 'http://127.0.0.1:8000'
+    apiKey: !!js process.env.ORCHESTRATOR_API_KEY
+    skills:
+      - cognitive-run
+      - constitutional-check
+      - synthesize-knowledge
+      - record-lesson
+      - capability-index
+
+# Use our session log as the persistence layer
+- id: sessions
+  name: '@deepseek-ai/dsh-session-persistence-jsonl'
+  config:
+    root: !!js process.env.DSH_SESSION_ROOT ?? '/workspace/orchestrator/data/dsh-sessions'
+
+# Schedule with our cron jobs
+- id: schedule
+  name: '@deepseek-ai/dsh-schedule'
+  config:
+    jobs:
+      - id: orchestrator-daily-digest
+        cron: '0 9 * * *'
+        tool: http-fetch
+        url: !!js process.env.ORCHESTRATOR_URL + '/api/funnel'
+
+# Token metering to our cost tracker
+- id: token-meter
+  name: '@deepseek-ai/dsh-llm-token-meter'
+  config:
+    sink: !!js process.env.ORCHESTRATOR_URL + '/api/dsh/meter/record'
+    sinkAuth: !!js process.env.ORCHESTRATOR_API_KEY
+
+# Sandbox with our policy
+- id: sandbox-policy
+  name: '@deepseek-ai/dsh-sandbox-policy'
+  config:
+    policy: !!js (() => {
+      const p = require('/workspace/orchestrator/server/security.py');
+      return p.DEFAULT_POLICY;
+    })()

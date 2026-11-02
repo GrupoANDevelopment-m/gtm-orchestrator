@@ -1,0 +1,52 @@
+# Plain manifests for `kubectl apply -f infra/k8s/` (Helm chart in infra/helm/).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speed-to-lead-agent
+  labels:
+    app.kubernetes.io/name: speed-to-lead-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: speed-to-lead-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: speed-to-lead-agent
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: api
+          image: ghcr.io/omatelabs/speed-to-lead-agent:0.1.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DEMO_MODE
+              value: "true"
+            - name: ENVIRONMENT
+              value: "k8s"
+          # Bring-your-own-key: uncomment to load secrets (kubectl create secret ...)
+          # envFrom:
+          #   - secretRef:
+          #       name: speed-to-lead-secrets
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
