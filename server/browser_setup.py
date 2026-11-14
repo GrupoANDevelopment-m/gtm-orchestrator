@@ -179,7 +179,7 @@ To enable browser-based social/CRM actions (no API keys needed), do this:
 4. RESTART the orchestrator
    bash bootstrap.sh
    # or
-   pkill -9 -f "python3.*api" && cd /workspace/orchestrator && nohup python3 -B server/api.py 8000 &
+   pkill -9 -f "python3.*api" && cd "$(pwd)" && nohup python3 -B server/api.py 8000 &
 
 5. VERIFY
    curl http://localhost:8000/api/browser/channels -H "Authorization: Bearer $API_KEY"

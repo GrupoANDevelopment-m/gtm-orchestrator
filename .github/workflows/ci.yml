@@ -39,11 +39,27 @@ jobs:
           python -c "
           import sys
           sys.path.insert(0, 'server')
-          # Import each module — catches import-time errors
-          for mod in ['text_sanitizer', 'security', 'observability', 'compliance', 'memory']:
-              __import__(mod)
-              print(f'  OK: {mod}')
+          mods = ['paths', 'text_sanitizer', 'security', 'observability', 'compliance',
+                  'memory', 'browser', 'browser_pool', 'browser_setup', 'browser_social',
+                  'playwright_social', 'social_adapters', 'n8n_flows', 'outreach_strategy',
+                  'cognitive_loop', 'voice_agent', 'dsh_bridge', 'llm_adapter']
+          failed = []
+          for mod in mods:
+              try:
+                  __import__(mod)
+                  print(f'  OK: {mod}')
+              except Exception as e:
+                  print(f'  FAIL: {mod}: {type(e).__name__}: {e}')
+                  failed.append(mod)
+          assert not failed, f'Failed imports: {failed}'
+          print(f'  {len(mods)}/{len(mods)} modules import cleanly')
           "
+
+      - name: Create runtime dirs + test key
+        run: |
+          mkdir -p data keys
+          echo "ci-test-key-not-a-real-secret" > keys/.orchestrator_api_key.txt
+          chmod 600 keys/.orchestrator_api_key.txt
 
       - name: Run unit tests (text_sanitizer, no server needed)
         run: |

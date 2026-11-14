@@ -16,6 +16,8 @@ from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any
 
+from paths import KEYS_DIR, WEBHOOK_SIGNING_KEY_PATH, API_KEY_PATH
+
 
 # === HMAC webhook signature verification ===
 
@@ -31,10 +33,10 @@ class WebhookSigner:
 
     def _load_secret(self) -> str:
         # Default to orchestrator API key if no webhook secret configured
-        p = Path("/workspace/orchestrator/keys/.webhook_signing_key.txt")
+        p = WEBHOOK_SIGNING_KEY_PATH
         if p.exists():
             return p.read_text().strip()
-        p = Path("/workspace/orchestrator/keys/.orchestrator_api_key.txt")
+        p = API_KEY_PATH
         if p.exists():
             return p.read_text().strip()
         return "default-dev-secret-rotate-in-prod"
@@ -199,7 +201,7 @@ class SecretsVault:
         self._load_from_disk()
 
     def _load_from_disk(self):
-        d = Path("/workspace/orchestrator/keys")
+        d = KEYS_DIR
         if not d.exists():
             return
         for f in d.glob(".nvidia_*.txt"):

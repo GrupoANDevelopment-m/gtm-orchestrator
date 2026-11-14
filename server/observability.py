@@ -13,6 +13,7 @@ Provides:
 from __future__ import annotations
 
 import json
+from paths import LOG_FILE as PATHS_LOG_FILE
 import os
 import signal
 import sys
@@ -28,7 +29,7 @@ from typing import Any, Callable
 
 # === STRUCTURED LOGS ===
 
-LOG_FILE = Path("/workspace/orchestrator/data/orchestrator.log.jsonl")
+LOG_FILE = PATHS_LOG_FILE
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 

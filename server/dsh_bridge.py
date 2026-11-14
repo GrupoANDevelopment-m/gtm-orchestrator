@@ -23,6 +23,7 @@ import subprocess
 import time
 import urllib.request
 from pathlib import Path
+from paths import DATA_DIR
 from typing import Optional
 
 
@@ -39,10 +40,10 @@ class DSHBridge:
         info = bridge.info()  # {"running": True, "url": "...", "port": 3090, "pid": ...}
     """
 
-    def __init__(self, *, port: int = 3090, host: str = "127.0.0.1", log_dir: str = "/workspace"):
+    def __init__(self, *, port: int = 3090, host: str = "127.0.0.1", log_dir: str = None):
         self.port = port
         self.host = host
-        self.log_dir = Path(log_dir)
+        self.log_dir = Path(log_dir) if log_dir else DATA_DIR
         self.log_path = self.log_dir / "dsh.log"
         self.proc: Optional[subprocess.Popen] = None
         self.url: Optional[str] = None

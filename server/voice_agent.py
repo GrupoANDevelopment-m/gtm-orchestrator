@@ -28,9 +28,10 @@ import json
 import time
 from pathlib import Path
 from typing import Any
+from paths import VOICE_KEY_PATH
 
 
-NIM_VOICE_KEY_PATH = Path("/workspace/orchestrator/keys/.nvidia_voice.txt")
+NIM_VOICE_KEY_PATH = VOICE_KEY_PATH
 
 
 def load_voice_key() -> str | None:

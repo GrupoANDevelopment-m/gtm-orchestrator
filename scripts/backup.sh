@@ -1,7 +1,7 @@
 #!/bin/bash
 # backup.sh — cron-runnable backup script.
 # Use:   bash scripts/backup.sh
-# Cron:  0 3 * * *  /workspace/orchestrator/scripts/backup.sh
+# Cron:  0 3 * * *  /path/to/orchestrator/scripts/backup.sh
 #
 # Backups:
 #   - orchestrator.sqlite3 -> orchestrator-YYYYMMDD-HHMMSS.sqlite3

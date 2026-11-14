@@ -23,10 +23,11 @@ import sqlite3
 import time
 import uuid
 from pathlib import Path
+from paths import DB_PATH as ORCH_DB_PATH
 from typing import Any
 
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "orchestrator.sqlite3"
+DB_PATH = ORCH_DB_PATH
 
 
 def _init():

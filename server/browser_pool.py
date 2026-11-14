@@ -15,6 +15,7 @@ import threading
 import time
 from collections import OrderedDict
 from pathlib import Path
+from paths import BROWSER_POOL_DIR
 from typing import Any, Optional
 
 
@@ -25,7 +26,7 @@ except ImportError:
     HAS_PLAYWRIGHT = False
 
 
-POOL_DIR = Path("/workspace/orchestrator/data/browser-pool")
+POOL_DIR = BROWSER_POOL_DIR
 POOL_DIR.mkdir(parents=True, exist_ok=True)
 
 

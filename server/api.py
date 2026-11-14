@@ -98,6 +98,7 @@ from dsh_schedule import Schedule, default_schedule as _default_schedule
 from dsh_meter import record as _meter_record, summary as _meter_summary, session_breakdown as _meter_session
 from dsh_sandbox import get_guard as _get_guard
 from dsh_skills import list_skills, create_skill, invoke_skill, seed_default_skills
+from paths import VOICE_KEY_PATH, ROOT as PROJECT_ROOT, ensure_dirs as _ensure_dirs
 import cognitive_loop as CL
 import memory as MEM
 import perception as PERC
@@ -456,7 +457,7 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/voice/test":
             key = None
             try:
-                p_ = Path("/workspace/orchestrator/keys/.nvidia_voice.txt")
+                p_ = VOICE_KEY_PATH
                 if p_.exists():
                     key = p_.read_text().strip()
             except Exception:
@@ -1206,7 +1207,7 @@ class Handler(BaseHTTPRequestHandler):
             # Test the user's voice model key
             key = None
             try:
-                p = Path("/workspace/orchestrator/keys/.nvidia_voice.txt")
+                p = VOICE_KEY_PATH
                 if p.exists():
                     key = p.read_text().strip()
             except Exception:
