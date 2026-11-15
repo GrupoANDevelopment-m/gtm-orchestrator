@@ -145,6 +145,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send_json(self, obj, status=200):
         body = json.dumps(obj, default=str, ensure_ascii=False).encode("utf-8")
+        # Record the real status for the observability wrapper
+        self._response_status = status
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -400,10 +402,17 @@ class Handler(BaseHTTPRequestHandler):
             })
 
         if p == "/api/browser/setup":
-            from browser_setup import check_all, SETUP_INSTRUCTIONS
-            status = check_all()
+            # Never fail this endpoint — it's a diagnostic. Report errors
+            # in the payload instead of raising a 500.
+            try:
+                from browser_setup import check_all, SETUP_INSTRUCTIONS
+                status = check_all()
+                instructions = SETUP_INSTRUCTIONS.strip()
+            except Exception as e:
+                status = {"error": f"{type(e).__name__}: {e}"}
+                instructions = ""
             return self._send_json({"status": status,
-                                    "instructions": SETUP_INSTRUCTIONS.strip()})
+                                    "instructions": instructions})
 
         # === GET mirrors of POST endpoints (for UI convenience) ===
         if p == "/api/observability/metrics":

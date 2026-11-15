@@ -97,6 +97,15 @@ jobs:
         run: |
           echo "=== server.log ==="
           cat server.log | tail -50
+          echo ""
+          echo "=== observability log (tracebacks) ==="
+          if [ -f data/orchestrator.log.jsonl ]; then
+            grep '"level":"error"' data/orchestrator.log.jsonl | tail -10 || true
+            echo "--- last 5 requests ---"
+            tail -5 data/orchestrator.log.jsonl || true
+          else
+            echo "(no observability log)"
+          fi
 
       - name: Cleanup
         if: always()

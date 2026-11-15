@@ -137,7 +137,8 @@ def safe_handler(handler_method: Callable) -> Callable:
         req_id = new_request_id()
         self._request_id = req_id
         start = time.time()
-        status_holder = [500]
+        # Default 500; _send_json() overwrites this with the real status code.
+        self._response_status = 500
         try:
             return handler_method(self, *args, **kwargs)
         except Exception as e:
@@ -154,9 +155,10 @@ def safe_handler(handler_method: Callable) -> Callable:
             duration = time.time() - start
             path = getattr(self, "path", "?")
             method = getattr(self, "command", "?")
+            status = getattr(self, "_response_status", 500)
             log_json("request", "completed",
                      request_id=req_id, path=path, method=method,
-                     status=status_holder[0], duration_ms=int(duration * 1000))
+                     status=status, duration_ms=int(duration * 1000))
             _metrics.inc("http_requests_total", 1, method=method, path=path)
             _metrics.observe("http_request_duration_ms", duration * 1000,
                              method=method, path=path)
