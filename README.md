@@ -1,137 +1,187 @@
-# GTM Orchestrator v4 — Internet-Enabled Real Merger
+# GTM Orchestrator v12
 
-A thin Python wrapper that imports real production code from **10 vendored open-source repos** and adds:
-- Internet access via 15+ platforms (Agent-Reach)
-- Real Google Maps scraping via Playwright + headless Chrome
-- NVIDIA NIM-backed LLM (Nemotron 30B default, step-3.7-flash and m2 alternatives)
-- Outbound: Twilio, SendGrid, Apollo, Hunter (live when keys present)
-- 4 anti-hallucination layers
+A fused AI agent for GTM/CRM that imports **real production code** from 10 vendored
+open-source repos and wires them together with a live NVIDIA NIM LLM, a 19-layer
+cognitive loop, multi-channel social automation, and GDPR/LGPD compliance.
 
-## Vendored repos (in `upstream/`)
+**No mocks. No stubs. No demo mode. No placeholder.**
 
-| Repo | What we use |
-|---|---|
-| **gtm-engine** | 5 agents: ICPAgent, OutboundAgent, DealIntelAgent, RetentionAgent, ContentAgent (real production Python code) |
-| **speed-to-lead** | RuleQualifier, TemplateDrafter, LlmDrafter, normalize, ICP similarity (real production Python code) |
-| **prospex** | Vendored, not yet wired (Playwright scraping — we use our own via browser.py) |
-| **crm-release** | Vendored, not yet wired (Bun/tRPC) |
-| **agent-reach** | 15 platforms: Twitter, LinkedIn, GitHub, Reddit, YouTube, Facebook, Instagram, Bilibili, Xiaohongshu, RSS, Web, etc. Falls back to Jina Reader when direct API fails. |
-| **browser-use** | LLM-driven browser agent (vendored, used as fallback) |
-| **browser-harness** | CDP direct browser control (vendored) |
-| **playwright-skill** | Playwright CLI (vendored) |
-| **browser-skill** | Rust-based browser (vendored) |
-
-## What it does end-to-end (verified via curl)
-
-```
-Google Maps prospect (Playwright + headless Chrome)
-  ↓
-Real businesses with name, address, phone, rating, website
-  ↓
-Save to local CRM (SQLite)
-  ↓
-Train ICPAgent on 3+ profiles (persisted)
-  ↓
-Score new leads via gtm-engine ICPAgent (NVIDIA NIM)
-  ↓
-Qualify via speed-to-lead RuleQualifier (intent detection)
-  ↓
-Generate 3 outbound email variations (gtm-engine OutboundAgent via NVIDIA NIM)
-  ↓
-Send via Twilio/SendGrid (live) or dry-run (mock with full payload shown)
-  ↓
-Enrich via Apollo/Hunter (live) or dry-run (shows what's missing)
-```
+---
 
 ## Quick start
 
 ```bash
-bash bootstrap.sh    # installs deps + generates API key + starts server on :8000
+git clone https://github.com/GrupoANDevelopment-m/gtm-orchestrator.git
+cd gtm-orchestrator
+
+pip install -r requirements.txt
+make server          # boots on :8002 (override with PORT=9000 make server)
+
+# Auth header
+KEY=$(cat keys/.orchestrator_api_key.txt)
+curl http://127.0.0.1:8002/health -H "Authorization: Bearer $KEY"
 ```
 
-Output shows the API key and example curls.
+Open <http://127.0.0.1:8002> for the full UI (30+ tabs, every endpoint exposed).
 
-## Endpoints (all return JSON)
+### Secrets
 
-### Public
-- `GET /` — UI
-- `GET /health` — Service status + integrations
-- `POST /webhooks/inbound` — Inbound lead webhook (Twilio, forms, email parsers)
-- `POST /webhooks/twilio` — Twilio inbound SMS/WhatsApp
+API keys live in `keys/` as `chmod 600` files and are **git-ignored**:
 
-### Auth required (`Authorization: Bearer <key>`)
-- `GET /api/leads` — List leads
-- `POST /api/leads` — Create lead
-- `GET /api/leads/{id}` — One lead
-- `POST /api/leads/{id}/icp` — Score (REAL ICPAgent via NIM)
-- `POST /api/leads/{id}/drafts` — 3 outbound variations (REAL OutboundAgent)
-- `POST /api/leads/{id}/speed` — Full Speed-to-Lead pipeline
-- `POST /api/leads/enrich` — Apollo + Hunter enrichment
-- `GET /api/drafts?status=X` — List drafts
-- `POST /api/drafts/{id}/approve` | `reject` — Approval workflow
-- `POST /api/drafts/send` — Send via Twilio/SendGrid
-- `POST /api/qualify` — speed-to-lead qualify
-- `POST /api/draft/reply` — speed-to-lead TemplateDrafter
-- `POST /api/draft/outbound` — gtm-engine OutboundAgent
-- `POST /api/deal/risk` — gtm-engine DealIntelAgent
-- `POST /api/account/health` — gtm-engine RetentionAgent
-- `POST /api/icp/train` — Train + persist ICPAgent
-- `GET /api/funnel` — Aggregate funnel stats
-- `GET /api/capabilities` — Full service + integration status
-- `GET /api/internet/platforms` — List Agent-Reach platforms
-- `POST /api/google_maps/prospect` — **REAL Google Maps via Playwright**
-- `POST /api/agent_reach/read` — Read from 15 platforms (Jina fallback)
-- `POST /api/internet/extract_leads` — Extract emails/phones from any URL
-- `POST /api/chat` — Agentic chat loop (17 tools, 4 anti-hallucination layers)
-
-## Configuration
-
-### Required: NVIDIA NIM key
-Drop into `keys/.nvidia_main.txt` (chmod 600) OR set `NVIDIA_API_KEY` env var.
-
-### Optional (live mode when present):
-- `keys/.twilio_account_sid.txt` + `keys/.twilio_auth_token.txt` — Twilio WhatsApp/SMS
-- `keys/.twilio_from.txt` + `keys/.twilio_whatsapp.txt` — sender numbers
-- `keys/.sendgrid_api_key.txt` — SendGrid email
-- `keys/.sendgrid_from.txt` — sender email
-- `keys/.apollo_api_key.txt` — Apollo.io enrichment
-- `keys/.hunter_api_key.txt` — Hunter.io email finder
-
-### Environment variables (override keys/ files):
-`ORCHESTRATOR_API_KEY`, `NVIDIA_API_KEY`, `NVIDIA_MODEL`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, `TWILIO_WHATSAPP_FROM`, `SENDGRID_API_KEY`, `SENDGRID_FROM`, `APOLLO_API_KEY`, `HUNTER_API_KEY`
-
-## Verified capabilities
-
-| Capability | Verified |
+| File | Purpose |
 |---|---|
-| Real Google Maps scraping | ✅ Tested with "SaaS startup Berlin", "real estate Miami", "dentist Jakarta", "coffee shop Lisbon" |
-| NVIDIA NIM-backed gtm-engine ICPAgent | ✅ score=0.5 with LLM-generated fit_signals |
-| speed-to-lead RuleQualifier | ✅ tier=hot score=0.9 intent=demo_request |
-| speed-to-lead TemplateDrafter | ✅ subject + body generated |
-| gtm-engine OutboundAgent | ✅ 3 variations with hooks (pain_point, recent_news, job_posting) |
-| gtm-engine DealIntelAgent | ✅ risk_score, risk_level, risk_factors, recommended_actions |
-| gtm-engine RetentionAgent | ✅ health_score, churn_driver, playbook, renewal_probability |
-| Agent-Reach with Jina fallback | ✅ Reads Hacker News, GitHub, etc |
-| API key auth | ✅ 401 without token, 200 with token |
-| Training state persistence | ✅ Survives server restart |
-| Webhook inbound | ✅ `/webhooks/inbound` creates lead + runs pipeline |
-| Approval workflow | ✅ approve / reject / send cycle |
+| `keys/.nvidia_main.txt` | NVIDIA NIM key (nemotron-3.5-lightning-30b-a3b) |
+| `keys/.nvidia_voice.txt` | NVIDIA NIM voice-model key |
+| `keys/.nvidia_m2.txt` / `.nvidia_step.txt` | Alternative models |
+| `keys/.orchestrator_api_key.txt` | Bearer token for the HTTP API |
+| `keys/.telegram_bot_token.txt` | Telegram Bot API token |
+| `keys/.webhook_signing_key.txt` | HMAC webhook signing secret |
+| `keys/.twilio_*.txt`, `.sendgrid_*.txt`, `.apollo_*.txt`, `.hunter_*.txt` | Outbound integrations |
 
-## Anti-hallucination layers
+---
 
-1. **Semantic tool selection** — Top 5 tools by message relevance (word-overlap scoring)
-2. **Pydantic-style arg validation** — Required args + type checks, re-ask on missing
-3. **Trimmed system prompt** — 40 lines of routing rules, not 305 lines of lore
-4. **Chain-of-Verification** — For high-stakes calls (create_lead, score_deal_risk, etc), verify args match user message
+## What it does end-to-end
 
-## Honest status
+```
+Google Maps prospect (Playwright + headless Chrome)
+  ↓
+Real businesses: name, address, phone, rating, website
+  ↓
+Persist to SQLite (leads table with icp_score / icp_tier)
+  ↓
+Score ICP      → gtm-engine ICPAgent (NVIDIA NIM)
+  ↓
+Qualify inbound → speed-to-lead RuleQualifier
+  ↓
+Draft reply    → speed-to-lead TemplateDrafter / LlmDrafter (NVIDIA NIM)
+  ↓
+Draft outbound → gtm-engine OutboundAgent (3 variations, NVIDIA NIM)
+  ↓
+Pick channel   → outreach_strategy (geo × industry affinity scoring)
+  ↓
+Send           → social_adapters (5 API) or playwright_social (9 browser)
+  ↓
+Audit + persist → audit_log table (SOC2 / GDPR Art. 30)
+```
 
-- ✅ All 4 originally-merged repos imported (gtm-engine, speed-to-lead fully wired; prospex, crm-release vendored)
-- ✅ All 6 new browser/internet repos integrated (Agent-Reach working, browser-use/playwright-skill used via Playwright)
-- ✅ NVIDIA NIM live (Nemotron 30B default, 2 alternatives)
-- ✅ Real Google Maps via Playwright (headless Chrome installed)
-- ✅ 17 tools exposed to LLM, 23 HTTP endpoints
-- ✅ Outbound integrations ready (live when keys, dry-run otherwise)
-- ✅ API key auth + persistent training + approval queue + webhooks
-- ⏳ Twilio/SendGrid/Apollo/Hunter: live mode requires keys
-- ⏳ prospex + crm-release: vendored but not yet bridged
+---
+
+## Architecture
+
+### Fused upstream repos (`upstream/`)
+
+| Repo | What we use |
+|---|---|
+| **gtm-engine** | ICPAgent, OutboundAgent, DealIntelAgent, RetentionAgent, ContentAgent (real production Python) |
+| **speed-to-lead** | RuleQualifier, TemplateDrafter, LlmDrafter, normalize, ICP similarity |
+| **prospex** | `LeadIntelligenceService` — Bayesian scoring + city priors (ported from the TypeScript original) |
+| **crm-release** | CRM schema + tRPC contract reference (`crm_adapter.py`) |
+| **agent-reach** | 15 platform readers (Twitter, Reddit, GitHub, YouTube, Bilibili, RSS, …) |
+| **browser-use** | LLM-driven browser agent (fallback) |
+| **browser-harness** | CDP direct browser control |
+| **playwright-skill** | Playwright CLI driver |
+| **browser-skill** | Rust-based browser bridge |
+| **dsh-skills** | DeepSeek Harness skill packs |
+
+### Modules (`server/`, 33 files)
+
+| Module | Role |
+|---|---|
+| `api.py` | 83+ HTTP endpoints, auth, HMAC, idempotency, all UI tab handlers |
+| `core.py` | Wires the real upstream agents; SQLite schema + migrations |
+| `cognitive_loop.py` | 19-layer ODC/ACAMR loop + 10 constitutional invariants |
+| `llm_adapter.py` | NVIDIA NIM router (thinking mode disabled for latency) |
+| `text_sanitizer.py` | Strips emojis from every LLM output (user requirement) |
+| `paths.py` | Portable path resolution — works in CI, Docker, any checkout path |
+| `security.py` | HMAC signer, OAuth scaffold, rate limiter, secrets vault |
+| `compliance.py` | GDPR/LGPD, CAN-SPAM, TCPA, consent, audit, retention |
+| `observability.py` | JSON logs, Prometheus metrics, circuit breakers, graceful shutdown |
+| `memory.py` | Episodic + semantic memory, lessons, capability index |
+| `perception.py` | 9-source input adapter (unified `Percept` shape) |
+| `world_model.py` | Context + state |
+| `goal_engine.py` | priority × urgency × impact / cost |
+| `reasoning.py` | NIM-powered chain-of-thought with function calling |
+| `social_adapters.py` | 5 WRITE channels (WhatsApp Cloud, Discord, Telegram, LinkedIn, Instagram) |
+| `browser_social.py` | 9 BROWSER channels via opencli subprocess |
+| `playwright_social.py` | 6 Playwright adapters using your logged-in Chrome |
+| `outreach_strategy.py` | Geo + industry channel scoring (16 countries, 10 industries) |
+| `n8n_flows.py` | 8 n8n-style automation flows |
+| `browser.py` | Agent-Reach (15 platforms) + Google Maps + direct REST APIs |
+| `voice_agent.py` | Twilio TwiML + NIM voice |
+| `integrations.py` | Twilio, SendGrid, Apollo, Hunter |
+| `prospex_adapter.py` / `crm_adapter.py` | Ported scoring / identity services |
+
+---
+
+## Channels (29 total)
+
+**5 WRITE (API)** — `whatsapp` · `discord` · `telegram` · `linkedin` · `instagram`
+Each accepts `transport=browser` to fall back to your logged-in Chrome session
+(no API key needed).
+
+**9 BROWSER (no API keys)** — Gmail · Twitter · LinkedIn · Instagram · Facebook ·
+Reddit · WhatsApp Web · HubSpot · Salesforce
+
+**15 READ (public APIs, no auth)** — web · github · github_trending · v2ex · rss ·
+youtube · hackernews · twitter · reddit · linkedin · facebook · instagram ·
+mastodon · threads · bilibili
+
+---
+
+## 8 n8n-style flows
+
+| Flow | Trigger | Runtime |
+|---|---|---|
+| `auto_respond_dm` | inbound DM | ~8s |
+| `lead_capture_to_crm` | social mention | ~12s |
+| `cross_post_content` | new content | ~20s |
+| `auto_engage_targets` | daily cron | ~60s |
+| `inbound_to_outbound` | webhook | ~5s |
+| `crm_hygiene` | weekly cron | ~30s |
+| `social_listening` | hourly | ~45s |
+| `quote_to_post` | user submit | ~25s |
+
+---
+
+## Constitutional invariants (I1–I10)
+
+I1 approval gate · I2 PII consent before egress · I3 token budget ·
+I4 per-call timeout · I5 audit trail for lead mutations · I6 subagent depth ≤ 3 ·
+I7 destructive ops need approval · I8 capability failure rate ≤ 50% ·
+I9 rate limits surfaced to operator · I10 skill promotion needs ≥ 3 lessons
+
+---
+
+## Testing & CI
+
+```bash
+make test-unit         # 24 unit tests, no server needed
+make test-integration  # 70 integration tests, server must be running
+make test              # everything
+make lint              # syntax check (33 modules) + emoji scan on UI
+make ci                # lint + unit + integration
+```
+
+GitHub Actions runs on every push and PR (`.github/workflows/ci.yml`):
+import smoke over 18 modules → unit tests → boot server → integration tests.
+
+**94 tests total.** Coverage includes every endpoint group, the 15 read platforms,
+the 5 write channels, the 8 flows, and the no-emoji guarantee across both the
+server output and the static UI.
+
+---
+
+## Design rules
+
+- **No emojis.** Enforced in `text_sanitizer.py` (server) and `stripEmojis()` (UI).
+  CJK, accented Latin and punctuation are preserved.
+- **No mocks.** Every endpoint hits real code — real SQLite, real NIM, real HTTP.
+- **No paid APIs required.** Browser channels drive your own logged-in Chrome.
+- **Paths are portable.** `server/paths.py` resolves everything relative to the
+  checkout, so CI, Docker and local all work.
+
+---
+
+## License
+
+Vendored upstream repos retain their original licenses (see each `upstream/*/LICENSE`).
